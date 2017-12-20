@@ -5,6 +5,14 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use MyApp\Game;
 
+if (!array_key_exists(1, $argv) || !array_key_exists(2, $argv) || $argv[1] !== '--port') {
+    echo 'Invalid usage' . PHP_EOL;
+    echo 'php server.php --port 8080' . PHP_EOL;
+    exit;
+}
+
+$port = $argv[2];
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/src/Event/Event.php';
 
@@ -30,7 +38,7 @@ $server = IoServer::factory(
             new Game()
         )
     ),
-    8080
+    $port
 );
 
 $server->run();

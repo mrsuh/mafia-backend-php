@@ -9,5 +9,5 @@ sh bin/deploy.sh
 
 ## Run
 ```bash
-php src/server.php
+php src/server.php --port 8080
 ```
