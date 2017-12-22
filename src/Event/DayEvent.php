@@ -69,7 +69,6 @@ class DayEvent extends Event
 
             foreach ($this->players->getAll() as $gamePlayer) {
                 $gamePlayer->sendMessage([
-                    'status' => 'ok',
                     'event'  => static::EVENT,
                     'action' => static::ACTION_OUT,
                     'player' => [

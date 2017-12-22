@@ -64,6 +64,27 @@ class Players
         return null;
     }
 
+    /**
+     * @param string $username
+     * @return null|Player
+     */
+    public function getOneByUsername(string $username)
+    {
+        foreach ($this->players as $player) {
+
+            if ($player->getStatus() === Player::STATUS_INACTIVE) {
+                continue;
+            }
+
+            if ($player->getUsername() === $username) {
+
+                return $player;
+            }
+        }
+
+        return null;
+    }
+
     public function getOneByRole(string $role)
     {
         foreach ($this->players as $player) {

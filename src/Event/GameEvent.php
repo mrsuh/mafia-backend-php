@@ -60,7 +60,6 @@ class GameEvent extends Event
         $this->players->add($player);
 
         $player->sendMessage([
-            'status'  => 'ok',
             'event'   => static::EVENT,
             'action'  => static::ACTION_CREATE,
             'game_id' => $this->gameId,
@@ -81,7 +80,6 @@ class GameEvent extends Event
 
         foreach ($this->players->getAll() as $gamePlayer) {
             $gamePlayer->sendMessage([
-                'status'  => 'ok',
                 'event'   => static::EVENT,
                 'action'  => static::ACTION_PLAYERS,
                 'players' => $players
@@ -91,11 +89,22 @@ class GameEvent extends Event
 
     public function joinAction(Player $player, array $msg = [])
     {
-        $player->setUsername($msg['username']);
+        $username = $msg['username'];
+        if (null !== $this->players->getOneByUsername($username)) {
+
+            $player->sendErrorMessage([
+                'event'   => static::EVENT,
+                'action'  => static::ACTION_JOIN,
+                'message' => 'Username already exists'
+            ]);
+
+            return false;
+        }
+
+        $player->setUsername($username);
         $this->players->add($player);
 
         $player->sendMessage([
-            'status' => 'ok',
             'event'  => static::EVENT,
             'action' => static::ACTION_JOIN,
             'player' => [
@@ -114,7 +123,6 @@ class GameEvent extends Event
 
         foreach ($this->players->getAll() as $gamePlayer) {
             $gamePlayer->sendMessage([
-                'status'  => 'ok',
                 'event'   => static::EVENT,
                 'action'  => static::ACTION_PLAYERS,
                 'players' => $players
@@ -125,8 +133,7 @@ class GameEvent extends Event
     public function startAction(Player $player, array $msg = [])
     {
         if (!$player->isMaster()) {
-            $player->sendMessage([
-                'status'  => 'error',
+            $player->sendErrorMessage([
                 'event'   => static::EVENT,
                 'action'  => static::ACTION_START,
                 'message' => 'access denied'
@@ -136,8 +143,7 @@ class GameEvent extends Event
         }
 
         if (count($this->players->getAll()) < 3) {
-            $player->sendMessage([
-                'status'  => 'error',
+            $player->sendErrorMessage([
                 'event'   => static::EVENT,
                 'action'  => static::ACTION_START,
                 'message' => 'too few players'

@@ -10,8 +10,9 @@ class SheriffEvent extends Event
 {
     const EVENT = 'sheriff';
 
-    const ACTION_CHOICE  = 'choice';
-    const ACTION_PLAYERS = 'players';
+    const ACTION_CHOICE      = 'choice';
+    const ACTION_CHOICE_DONE = 'choice-done';
+    const ACTION_PLAYERS     = 'players';
 
     private $choice;
 
@@ -21,7 +22,7 @@ class SheriffEvent extends Event
 
         $this->choice       = null;
         $this->eventPlayers = $this->players->getAll();
-        $this->actions      = [static::ACTION_STARTED, static::ACTION_ENDED, static::ACTION_CHOICE];
+        $this->actions      = [static::ACTION_STARTED, static::ACTION_ENDED, static::ACTION_CHOICE, static::ACTION_CHOICE_DONE];
         $sheriff            = $this->players->getOneByRole(Player::ROLE_SHERIFF);
 
         $hasSheriff = null !== $sheriff;
@@ -87,8 +88,27 @@ class SheriffEvent extends Event
         $player->sendMessage([
             'event'  => static::EVENT,
             'action' => static::ACTION_CHOICE,
-            'role'   => $playerChoice->getRole()
+            'player' => [
+                'id'       => $playerChoice->getId(),
+                'username' => $playerChoice->getUsername(),
+                'role'     => $playerChoice->getRole()
+            ]
         ]);
+
+        return true;
+    }
+
+    public function choiceDoneAction(Player $player)
+    {
+        if ($player->getRole() !== Player::ROLE_SHERIFF) {
+            $player->sendErrorMessage([
+                'event'   => static::EVENT,
+                'action'  => static::ACTION_CHOICE,
+                'message' => 'access denied'
+            ]);
+
+            return false;
+        }
 
         $this->processed = true;
 
@@ -106,6 +126,9 @@ class SheriffEvent extends Event
                 break;
             case static::ACTION_CHOICE:
                 $this->choiceAction($player, $msg);
+                break;
+            case static::ACTION_CHOICE_DONE:
+                $this->choiceDoneAction($player);
                 break;
         }
 

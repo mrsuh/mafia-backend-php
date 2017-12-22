@@ -22,8 +22,7 @@ class Game
 
     public function __construct()
     {
-        $this->id = 767;
-//        $this->id = random_int(100, 999);
+        $this->id = random_int(100, 999);
 
         $this->players      = new Players();
         $this->history      = new History();

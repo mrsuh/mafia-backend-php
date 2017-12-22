@@ -64,8 +64,7 @@ class GirlEvent extends Event
     public function choiceAction(Player $player, array $msg)
     {
         if ($player->getRole() !== Player::ROLE_GIRL) {
-            $player->sendMessage([
-                'status'  => 'error',
+            $player->sendErrorMessage([
                 'event'   => static::EVENT,
                 'action'  => static::ACTION_CHOICE,
                 'message' => 'access denied'

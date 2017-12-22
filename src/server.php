@@ -23,6 +23,7 @@ $dirs = [
     dirname(__DIR__) . '/src/History',
     dirname(__DIR__) . '/src/Player',
 ];
+
 foreach ($dirs as $dir) {
     foreach (scandir($dir) as $filename) {
         $path = $dir . '/' . $filename;
