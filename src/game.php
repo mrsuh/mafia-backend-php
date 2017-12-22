@@ -5,6 +5,7 @@ namespace MyApp;
 use App\Control;
 use App\Event\Event;
 use App\Event\GameEvent;
+use App\Event\PingPongEvent;
 use App\Player\Player;
 use App\Player\Players;
 use Ratchet\MessageComponentInterface;
@@ -78,7 +79,6 @@ class Game implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msgRaw)
     {
-
         $msg = json_decode($msgRaw, true);
 
         if (!is_array($msg)) {
@@ -106,6 +106,16 @@ class Game implements MessageComponentInterface
         $gameId       = (int)$msg['game_id'];
         $eventString  = (string)$msg['event'];
         $actionString = (string)$msg['action'];
+
+        if ($eventString === PingPongEvent::EVENT && $actionString === PingPongEvent::ACTION_PING) {
+            $from->send(json_encode([
+                'status' => 'ok',
+                'event'  => PingPongEvent::EVENT,
+                'action' => PingPongEvent::ACTION_PONG
+            ]));
+
+            return false;
+        }
 
         $game = $this->getGame($from, $gameId, $eventString, $actionString);
 
