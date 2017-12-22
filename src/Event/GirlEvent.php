@@ -99,6 +99,7 @@ class GirlEvent extends Event
                 'message' => 'double check'
             ]);
 
+            $this->processing = false;
             return false;
         }
 

@@ -73,7 +73,7 @@ class History
     {
         $events = [];
         foreach ($this->history as $event) {
-            if ($event->getIteration() === $iteration) {
+            if ((int)$event->getIteration() === (int)$iteration) {
                 $events[] = $event;
             }
         }

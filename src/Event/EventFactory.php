@@ -73,7 +73,7 @@ class EventFactory
             return null;
         }
 
-        $this->history->addEvent($this->current);
+        $this->history->addEvent(clone $this->current);
 
         switch ($this->current::EVENT) {
             case GameEvent::EVENT:
@@ -119,6 +119,7 @@ class EventFactory
                 $event = new SheriffEvent($this->history, $this->players, $this->gameId, $this->iteration);
                 break;
             case SheriffEvent::EVENT:
+                $this->iteration++;
                 $event = new DayEvent($this->history, $this->players, $this->gameId, $this->iteration);
                 break;
             default:

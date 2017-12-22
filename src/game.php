@@ -27,16 +27,38 @@ class Game implements MessageComponentInterface
 
     private function getGame(ConnectionInterface $conn, int $gameId, string $event, string $action)
     {
-        if (!empty($gameId)) {
-            return $this->control->findGameById($gameId);
+        $game = $this->control->findGameById($gameId);
+
+        if (GameEvent::ACTION_CREATE === $action && null !== $game) {
+            $conn->send([
+                'status'  => 'error',
+                'message' => 'game already exists'
+            ]);
+
+            return null;
+        }
+
+        if (null !== $game) {
+
+            return $game;
         }
 
         if (GameEvent::EVENT !== $event) {
-            //todo
+            $conn->send([
+                'status'  => 'error',
+                'message' => 'invalid event'
+            ]);
+
+            return null;
         }
 
         if (GameEvent::ACTION_CREATE !== $action) {
-            //todo
+            $conn->send([
+                'status'  => 'error',
+                'message' => 'invalid action'
+            ]);
+
+            return null;
         }
 
         echo 'NEW GAME' . PHP_EOL;

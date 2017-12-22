@@ -95,6 +95,8 @@ class DoctorEvent extends Event
                 'message' => 'double check'
             ]);
 
+            $this->processing = false;
+
             return false;
         }
 

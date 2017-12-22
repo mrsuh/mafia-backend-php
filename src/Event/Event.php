@@ -92,7 +92,7 @@ abstract class Event
         $this->endedPlayers   = [];
         $this->eventPlayers   = [];
 
-        $this->actions = [static::ACTION_STARTED];
+        $this->actions = [static::ACTION_STARTED, static::ACTION_ENDED];
     }
 
     public function getIteration()

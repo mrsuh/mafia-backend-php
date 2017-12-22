@@ -10,7 +10,10 @@ class DayEvent extends Event
 {
     const EVENT = 'day';
 
-    const ACTION_OUT = 'out';
+    const ACTION_OUT    = 'out';
+    const ACTION_ACCEPT = 'accept';
+
+    private $acceptedPlayers;
 
     public function __construct(History $history, Players $players, $gameId, $iteration = 1)
     {
@@ -18,8 +21,10 @@ class DayEvent extends Event
 
         $this->eventPlayers = $this->players->getAll();
 
-        $this->ending = true;
-        $this->ended  = true;
+        $this->ending          = true;
+        $this->ended           = true;
+        $this->actions         = [static::ACTION_STARTED, static::ACTION_ENDED, static::ACTION_ACCEPT];
+        $this->acceptedPlayers = [];
     }
 
     public function process()
@@ -68,6 +73,11 @@ class DayEvent extends Event
             $player = $this->players->getOneById($dead->getId());
 
             foreach ($this->players->getAll() as $gamePlayer) {
+
+                if ($gamePlayer->getId() !== $player->getId()) {
+                    $this->acceptedPlayers[$gamePlayer->getId()] = false;
+                }
+
                 $gamePlayer->sendMessage([
                     'event'  => static::EVENT,
                     'action' => static::ACTION_OUT,
@@ -82,7 +92,50 @@ class DayEvent extends Event
         }
 
         $this->processing = true;
-        $this->processed  = true;
+        $this->processed  = null === $dead;
+
+        return true;
+    }
+
+    public function isProcessed()
+    {
+        $processed = true;
+        foreach ($this->acceptedPlayers as $playerId => $value) {
+            if (!$value) {
+                $processed = false;
+                break;
+            }
+        }
+
+        return $processed;
+    }
+
+    public function acceptAction(Player $player)
+    {
+        if (!array_key_exists($player->getId(), $this->acceptedPlayers)) {
+            return false;
+        }
+
+        $this->acceptedPlayers[$player->getId()] = true;
+
+        return true;
+    }
+
+    public function action(string $action, Player $player, array $msg = [])
+    {
+        switch ($action) {
+            case static::ACTION_STARTED:
+                $this->startedAction($player);
+                break;
+            case static::ACTION_ENDED:
+                $this->endedAction($player);
+                break;
+            case static::ACTION_ACCEPT:
+                $this->acceptAction($player);
+                break;
+            default:
+                return false;
+        }
 
         return true;
     }
