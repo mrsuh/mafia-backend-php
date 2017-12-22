@@ -67,11 +67,15 @@ class Game implements MessageComponentInterface
         return $this->control->createGame();
     }
 
-    private function getPlayer(ConnectionInterface $conn, Players $players)
+    private function getPlayer(ConnectionInterface $conn, string $gamerId, Players $players)
     {
-        if (null === $player = $players->getOneByConnectionId($conn->resourceId)) {
+        if (null === $player = $players->getOneById($gamerId)) {
             echo 'NEW PLAYER' . PHP_EOL;
             $player = new Player($conn);
+        }
+
+        if ($player->getConnectionId() !== $conn->resourceId) {
+            $player->setConnection($conn);
         }
 
         return $player;
@@ -92,7 +96,7 @@ class Game implements MessageComponentInterface
 
         echo $msgRaw . PHP_EOL;
 
-        foreach (['game_id', 'event', 'action'] as $key) {
+        foreach (['game_id', 'gamer_id', 'event', 'action'] as $key) {
             if (!array_key_exists($key, $msg)) {
                 $from->send(json_encode([
                     'status'  => 'error',
@@ -104,6 +108,7 @@ class Game implements MessageComponentInterface
         }
 
         $gameId       = (int)$msg['game_id'];
+        $gamerId      = (string)$msg['gamer_id'];
         $eventString  = (string)$msg['event'];
         $actionString = (string)$msg['action'];
 
@@ -128,7 +133,7 @@ class Game implements MessageComponentInterface
             return false;
         }
 
-        $player = $this->getPlayer($from, $game->getPlayers());
+        $player = $this->getPlayer($from, $gamerId, $game->getPlayers());
 
         $currentEvent = $game->getEventFactory()->getCurrent();
 

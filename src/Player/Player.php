@@ -36,6 +36,11 @@ class Player
         $this->status     = self::STATUS_ACTIVE;
     }
 
+    public function setConnection(ConnectionInterface $connection)
+    {
+        $this->connection = $connection;
+    }
+
     public function setMaster(bool $master)
     {
         $this->master = $master;
